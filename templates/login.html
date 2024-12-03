@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Stock Market</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            color: white;
+            overflow-x: hidden;
+            background-image: url("{{ url_for('static', filename='background.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Overlay to improve readability */
+            z-index: 1;
+        }
+
+        .login-container {
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 2;
+            margin: auto;
+        }
+
+        .login-container img {
+            display: block;
+            margin: 0 auto 20px;
+            width: 60px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ffffff;
+            font-weight: 700;
+        }
+        .btn-home {
+            display: block;
+            margin: 15px auto;
+            text-align: center;
+            background-color: #1abc9c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            width: 100%;
+            max-width: 200px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-home:hover {
+            background-color: #1abc9c;
+        }
+
+        label {
+            color: #ffffff;
+        }
+
+        .form-control {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            box-shadow: none;
+            outline: none;
+            border: 2px solid #1abc9c;
+        }
+
+        .btn-login {
+            background-color: #1abc9c;
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            width: 100%;
+            margin-top: 20px;
+            transition: background-color 0.3s ease, transform 0.2s;
+        }
+
+        .btn-login:hover {
+            background-color: #16a085;
+            transform: scale(1.05);
+        }
+
+
+        .form-text {
+            text-align: center;
+            margin-top: 5px;
+            color: #ffffff;
+        }
+
+        .form-text a {
+            color: #1abc9c;
+        }
+
+        .form-text a:hover {
+            text-decoration: underline;
+        }
+
+        .d-flex.align-items-center label {
+            margin-left: 5px; /* Space between the checkbox and the label */
+        }
+
+        .form-group.d-flex {
+            margin-top: 5px;
+        
+        }
+        .form-group a {
+            color: #1abc9c;
+        }
+
+        .remember-me-container {
+            display: flex;
+            align-items: center;
+            
+        }
+
+        .remember-me-container label {
+            margin-left: 5px; /* Space between checkbox and label */
+        }
+
+        .forgot-password {
+            color: white; /* Adjust as needed */
+            text-decoration: none;
+            margin-left: 10px; /* Add space between "Remember Me" and "Forgot Password?" */
+        }
+
+        .forgot-password:hover {
+            color: #00b5ad;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            /* For smaller screens, stack elements vertically */
+            .form-group.d-flex {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+            .forgot-password {
+                margin-top: 0px; /* Add space on smaller screens */
+                margin-left: 0; /* Remove margin to avoid offset */
+            }
+        }
+
+
+        .container-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header {
+            background-color: rgba(0, 0, 0, 0.85);
+            padding: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .header .logo-section {
+            display: flex;
+            align-items: center;
+        }
+        .header .logo-section img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        .header .logo-section h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .user-icon {
+            font-size: 1.5rem;
+            color: white;
+            padding-right: 10px;
+        }
+
+        .footer {
+            background-color: #0c233d;
+            padding: 0px;
+            text-align: center;
+            color: white;
+            width: 100%;
+            position: relative;
+            bottom: 0;
+        }
+
+        .footer {
+            background-color: rgba(0, 0, 0, 0.85);
+            padding: 0px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            right: 0%;
+            bottom: 0;
+            z-index: 100;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+       
+        .footer a {
+            color: #1abc9c;
+            right: 10px;
+            text-decoration: none;
+            margin: 0;
+        }
+
+        .footer a:hover {
+            color: #1abc9c;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="logo-section">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+            <h2>STOCK MARKET</h2>
+        </div>
+        
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay"></div>
+
+    <div class="container-wrapper">
+        <div class="login-container">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+            <h2>Login</h2>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="container">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.username.label(class="form-control-label") }}
+                    {{ form.username(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.password.label(class="form-control-label") }}
+                    {{ form.password(class="form-control") }}
+                </div>
+                
+                <div class="form-group d-flex justify-content-between align-items-center">
+                    <div class="remember-me">
+                        <input type="checkbox" id="rememberMe">
+                        <label for="rememberMe">Remember Me</label>
+                    </div>
+                    <a href="{{ url_for('forgot_password') }}" class="forgot_password">Forgot Password?</a>
+                </div>
+                <button type="submit" class="btn-login">Login</button>
+                <p class="form-text">Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+                <a href="{{ url_for('index') }}" class="btn-home">Back to Home</a>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2024 Stock Market Platform | 
+            <a href="{{ url_for('help') }}">Help</a> | 
+            <a href="{{ url_for('settings') }}">Settings</a>
+        </p>
+    </div>
+
+</body>
+</html>
+
+

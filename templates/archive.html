@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Market Archive</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #0a1f33;
+            font-family: 'Arial', sans-serif;
+            color: white;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .logo {
+            display: block;
+            width: 40px;
+            height: 40px;
+            vertical-align: middle;
+        }
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 220px;
+            height: calc(100% - 60px);
+            background-color: #0c233d;
+            padding-top: 20px;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .sidebar ul li {
+            padding: 15px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            color: white;
+            
+        }
+        .sidebar ul li a {
+            color: white;  /* Change text color to white */
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar ul li:hover {
+            background-color: #0c233d;
+        }
+        .sidebar li i {
+            font-size: 1.5rem;
+            color: white;
+            margin-right: 10px;
+        }
+        .main-content {
+        margin-left: 240px;
+        padding: 80px 20px 20px 20px; /* Add top padding to clear the fixed header */
+        height: calc(100vh - 80px); /* Adjust height calculation */
+        overflow: auto;
+        }
+        
+        .table-container {
+            margin-top: 20px;
+            background-color: #13284d;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        table {
+            width: 100%;
+            color: white; /* Set the text color to white */
+            border-collapse: collapse;
+        }
+        table th, table td {
+            padding: 10px;
+            text-align: left;
+            color: white; /* Make sure both headers and rows text are white */
+        }
+        table th {
+            background-color: #198cb3;
+            color: white;
+            border-bottom: 2px solid #0c233d;
+        }
+        table tr {
+            border-bottom: 1px solid #243e66;
+        }
+        table tr:nth-child(even) {
+            background-color: #243e66;
+        }
+        table tr:hover {
+            background-color: #198cb3;
+        }
+        .header {
+            background-color: #0c233d;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            height: 60px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+        }
+        .header .logo-section {
+            display: flex;
+            align-items: center;
+        }
+        .header .logo-section img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        .header .logo-section h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            overflow: auto;
+        }
+        .user-icon {
+            font-size: 1.5rem;
+            color: white;
+            padding-right: 10px;
+        }
+        .social-icons {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            gap: 15px; /* Add space between icons */
+            align-items: center;
+            
+        }
+        .social-icons a {
+            font-size: 1.5rem;
+            text-decoration: none;
+            color: white;
+            
+        }       
+        .footer {
+            background-color: rgba(12, 35, 61, 0.9);
+            padding: 0px;
+            text-align: center;
+            color: white;
+            width: 100%;
+            position: fixed;
+            bottom: 0px;
+            align-items: center;
+        }
+        
+
+        .footer a {
+            color: #3498db;
+            text-decoration: none;
+            margin: 5px 5px;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo-section">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+            <h2>STOCK MARKET</h2>
+        </div>
+        <div>
+            <i class="fas fa-user-circle user-icon"></i> {{ current_user.username }}
+            <a href="{{ url_for('logout') }}" class="btn btn-light ml-2">Logout</a>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <ul>
+            <li><i class="fas fa-chart-line"></i> <a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><i class="fas fa-chart-area"></i> <a href="{{ url_for('market_trends') }}">Market Trends</a></li>
+            <li><i class="fas fa-archive"></i> <a href="{{ url_for('archive') }}">Archive</a></li>
+            <li><i class="fas fa-cog"></i> <a href="{{ url_for('settings') }}">Settings</a></li>
+            <li><i class="fas fa-question-circle"></i> <a href="{{ url_for('help') }}">Help</a></li>
+        </ul>
+    </div>
+     <!-- Footer -->
+     <div class="footer">
+        <p>&copy; 2024 Stock Market Platform | 
+            <a href="{{ url_for('help') }}">Help</a> | 
+            <a href="{{ url_for('settings') }}">Settings</a>
+        </p>
+    </div>
+    <div class="social-icons">
+        <a href="https://instagram.com" target="_blank" class="fab fa-instagram"></a>
+        <a href="https://twitter.com" target="_blank" class="fab fa-twitter"></a>
+        <a href="https://linkedin.com" target="_blank" class="fab fa-linkedin"></a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h3>Archived Stock Data</h3>
+        <div class="table-container">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Stock Symbol</th>
+                        <th>Date</th>
+                        <th>Opening Price</th>
+                        <th>High Price</th>
+                        <th>Low Price</th>
+                        <th>Closing Price</th>
+                        <th>Volume</th>
+                    </tr>
+                </thead>
+                <tbody id="archiveTableBody">
+                    <!-- Manually Inserted Data -->
+                    <tr>
+                        <td>AAPL</td>
+                        <td>2024-10-01</td>
+                        <td>145.30</td>
+                        <td>150.00</td>
+                        <td>140.20</td>
+                        <td>148.90</td>
+                        <td>80,000,000</td>
+                    </tr>
+                    <tr>
+                        <td>GOOGL</td>
+                        <td>2024-10-02</td>
+                        <td>130.50</td>
+                        <td>132.00</td>
+                        <td>128.00</td>
+                        <td>130.80</td>
+                        <td>1,500,000</td>
+                    </tr>
+                    <tr>
+                        <td>MSFT</td>
+                        <td>2024-10-03</td>
+                        <td>250.30</td>
+                        <td>255.00</td>
+                        <td>248.00</td>
+                        <td>253.90</td>
+                        <td>50,000,000</td>
+                    </tr>
+                    <tr>
+                        <td>TSLA</td>
+                        <td>2024-10-04</td>
+                        <td>210.00</td>
+                        <td>215.50</td>
+                        <td>205.00</td>
+                        <td>212.70</td>
+                        <td>120,000,000</td>
+                    </tr>
+                    <tr>
+                        <td>AMZN</td>
+                        <td>2024-10-05</td>
+                        <td>160.50</td>
+                        <td>165.00</td>
+                        <td>158.00</td>
+                        <td>162.50</td>
+                        <td>10,000,000</td>
+                    </tr>
+                    <tr>
+                        <td>CSCO</td>
+                        <td>2024-10-05</td>
+                        <td>55.00</td>
+                        <td>56.50</td>
+                        <td>54.50</td>
+                        <td>56.00</td>
+                        <td>8,000,000</td>
+                    </tr>
+                    <tr>
+                        <td>NFLX</td>
+                        <td>2024-10-06</td>
+                        <td>690.00</td>
+                        <td>700.50</td>
+                        <td>680.00</td>
+                        <td>695.50</td>
+                        <td>7,500,000</td>
+                    </tr>
+                    <tr>
+                        <td>NVDA</td>
+                        <td>2024-10-07</td>
+                        <td>420.30</td>
+                        <td>430.00</td>
+                        <td>410.50</td>
+                        <td>425.80</td>
+                        <td>20,000,000</td>
+                    </tr>
+                    <tr>
+                        <td>META</td>
+                        <td>2024-10-08</td>
+                        <td>290.50</td>
+                        <td>295.00</td>
+                        <td>285.00</td>
+                        <td>292.10</td>
+                        <td>15,000,000</td>
+                    </tr>
+                    <tr>
+                        <td>IBM</td>
+                        <td>2024-10-09</td>
+                        <td>120.00</td>
+                        <td>125.00</td>
+                        <td>118.00</td>
+                        <td>122.50</td>
+                        <td>6,000,000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

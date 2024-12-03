@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Market Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #0f2d4d;
+            font-family: 'Arial', sans-serif;
+            color: white;
+            margin: 0;
+            padding: 0;
+            overflow: auto;
+        }
+        .logo {
+            display: block;
+            width: 40px;
+            height: 40px;
+            vertical-align: middle;
+        }
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 220px;
+            height: calc(100% - 60px);
+            background-color: #0c233d;
+            padding-top: 20px;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .sidebar ul li {
+            padding: 15px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            color: white;
+            
+        }
+        .sidebar ul li a {
+            color: white;  /* Change text color to white */
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar ul li:hover {
+            background-color: #0c233d;
+        }
+        .sidebar li i {
+            font-size: 1.5rem;
+            color: white;
+            margin-right: 10px;
+        }
+        .main-content {
+            margin-left: 240px;
+            padding: 80px 20px 20px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            height: calc(100vh - 80px);
+            overflow: auto;
+        }
+        .kpi-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 0px;
+            margin-bottom: 20px;
+        }
+
+        .kpi-box {
+            flex: 1 1 calc(10% - 10px); /* Ensure equal widths */
+            max-width: 100px;
+            background-color: #1b3b63;
+            padding: 10px;
+            text-align: center;
+            border-radius: 10px;
+            color: #FFFFFF;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .kpi-filter-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Space between input fields and buttons */
+        }
+
+        .date-filter {
+            display: flex;
+            gap: 10px; /* Space between date fields */
+            align-items: right;
+            padding: 5px 10px;
+            background-color: #1b3b63;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .date-input {
+            max-width: 120px;
+            margin-right: 8px;
+            padding: 5px;
+            background-color: #1f3b5f;
+            border: 1px solid #3498db;
+            color: #fff;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .filter-btn {
+            padding: 5px 12px;
+            background-color: #3498db;
+            border-color: #3498db;
+            color: #ffffff;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .filter-btn:hover {
+            background-color: #2980b9;
+        }
+
+
+
+        @media (max-width: 768px) {
+            .kpi-filter-container {
+                flex-direction: column; /* Stack on smaller screens */
+                align-items: flex-start;
+            }
+
+            .date-filter {
+                margin-top: 10px; /* Add spacing when stacked */
+            }
+        }   
+
+        .header-values {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+        }
+        .chart-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px; /* Space between charts */
+        }
+
+        .chart-box {
+            background-color: #1b3b63;
+            border-radius: 15px;
+            padding: 50px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            height: 500px; /* Set consistent height */
+        }
+
+        .chart-box {
+            width: 49%;
+            height: 350px;
+            background-color: #1b3b63;
+            border-radius: 15px;
+            padding: 35px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .date-filter {
+            background-color: #0c233d;
+            margin-left: 350px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header {
+            background-color: #0c233d;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            height: 60px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+        }
+        .header .logo-section {
+            display: flex;
+            align-items: center;
+        }
+        .header .logo-section img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        .header .logo-section h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            overflow: auto;
+        }
+        .news-ticker {
+            
+            color: whitesmoke;
+            padding: 5px;
+            font-size: 1.2rem;
+            position: fixed;
+            width: 100%;
+            top: 60px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .ticker-item {
+            display: inline-block;
+            margin-right: 50px;
+            animation: ticker 15s linear infinite;
+        }
+        @keyframes ticker {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
+        }
+        .user-icon {
+            font-size: 1.5rem;
+            color: white;
+            padding-right: 10px;
+        }
+        .social-icons {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            gap: 15px; /* Add space between icons */
+            
+        }
+
+        .social-icons a {
+            font-size: 1.5rem;
+            text-decoration: none;
+            color: white;
+        }
+        .arrow span {
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+
+        .arrow span .up {
+            color: #4CAF50; /* Green for positive change */
+        }
+
+        .arrow span .down {
+            color: #FF6347; /* Red for negative change */
+        }
+
+        .footer {
+            background-color: rgba(12, 35, 61, 0.9);
+            padding: 0px;
+            text-align: center;
+            color: white;
+            width: 100%;
+            position: fixed;
+            bottom: 0px;
+            align-items: center;
+        }
+        
+
+        .footer a {
+            color: #3498db;
+            text-decoration: none;
+            margin: 5px 5px;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+   
+    <div class="header">
+        <div class="logo-section">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+            <h2>STOCK MARKET</h2>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Enter company symbol (e.g., AAPL)">
+            <button id="searchButton">Search</button>
+            <button id="resetButton">Reset</button>
+        </div>
+        <div>
+            <i class="fas fa-user-circle user-icon"></i> {{ current_user.username }}
+            <a href="{{ url_for('logout') }}" class="btn btn-light ml-2">Logout</a>
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <ul>
+            <li><i class="fas fa-chart-line"></i> <a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><i class="fas fa-chart-area"></i> <a href="{{ url_for('market_trends') }}">Market Trends</a></li>
+            <li><i class="fas fa-archive"></i> <a href="{{ url_for('archive') }}">Archive</a></li>
+            <li><i class="fas fa-cog"></i> <a href="{{ url_for('settings') }}">Settings</a></li>
+            <li><i class="fas fa-question-circle"></i> <a href="{{ url_for('help') }}">Help</a></li>
+        </ul>
+    </div>
+
+
+   
+    <div class="main-content">
+         <!-- Filter Section -->
+         <div class="date-filter d-flex align-items-center">
+            <label for="filterFromDate" class="date-label">From:</label>
+            <input type="date" id="filterFromDate" class="form-control date-input" placeholder="From Date">
+            <label for="filterToDate" class="date-label">To:</label>
+            <input type="date" id="filterToDate" class="form-control date-input" placeholder="To Date">
+            <button class="btn btn-primary filter-btn">Filter</button>
+        </div>
+        <div class="kpi-filter-container d-flex align-items-center justify-content-between mt-4">
+            <!-- KPI Section -->
+            <div class="kpi-group d-flex flex-wrap">
+                <div class="kpi-box mx-2">
+                    <h5>AAPL</h5>
+                    <span class="header-values" id="AAPLValue"></span>
+                    <span class="arrow" id="AAPLArrow"></span>
+                </div>
+                <div class="kpi-box mx-2">
+                    <h5>GOOGL</h5>
+                    <span class="header-values" id="GOOGLValue"></span>
+                    <span class="arrow" id="GOOGLArrow"></span>
+                </div>
+                <div class="kpi-box mx-2">
+                    <h5>MSFT</h5>
+                    <span class="header-values" id="MSFTValue"></span>
+                    <span class="arrow" id="MSFTArrow"></span>
+                </div>
+                <div class="kpi-box mx-2">
+                    <h5>TSLA</h5>
+                    <span class="header-values" id="TSLAValue"></span>
+                    <span class="arrow" id="TSLAArrow"></span>
+                </div>
+                <div class="kpi-box mx-2">
+                    <h5>AMZN</h5>
+                    <span class="header-values" id="AMZNValue"></span>
+                    <span class="arrow" id="AMZNArrow"></span>
+                </div>
+                <div class="kpi-box mx-2">
+                    <h5>CSCO</h5>
+                    <span class="header-values" id="CSCOValue"></span>
+                    <span class="arrow" id="CSCOArrow"></span>
+                </div>
+                <div class="kpi-box mx-2">
+                    <h5>NFLX</h5>
+                    <span class="header-values" id="NFLXValue"></span>
+                    <span class="arrow" id="NFLXArrow"></span>
+                </div>
+                <div class="kpi-box mx-2">
+                    <h5>NVDA</h5>
+                    <span class="header-values" id="NVDAValue"></span>
+                    <span class="arrow" id="NVDAArrow"></span>
+                </div>
+                <div class="kpi-box mx-2">
+                    <h5>META</h5>
+                    <span class="header-values" id="METAValue"></span>
+                    <span class="arrow" id="METAArrow"></span>
+                </div>
+                <div class="kpi-box mx-2">
+                    <h5>IBM</h5>
+                    <span class="header-values" id="IBMValue"></span>
+                    <span class="arrow" id="IBMArrow"></span>
+                </div>
+                
+            
+            </div>
+            
+        </div>
+
+        <!-- Chart Section -->
+        <div class="chart-box">
+            <h4>Market Trends</h4>
+            <canvas id="marketTrendsChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h4>Stock Price Movements</h4>
+            <canvas id="stockPriceMovementsChart"></canvas>
+        </div>
+
+        <!-- Additional Chart 1: Stock Price Variations -->
+        <div class="chart-box">
+            <h4>Stock Price Variations</h4>
+            <canvas id="stockPriceVariationsChart"></canvas>
+        </div>
+
+        <!-- Additional Chart 2: Moving Average -->
+        <div class="chart-box">
+            <h4>Moving Averages</h4>
+            <canvas id="movingAverageChart"></canvas>
+        </div>
+
+        <!-- Distribution and Company Statistics -->
+        <div class="chart-box">
+            <h4>Distribution</h4>
+            <canvas id="distributionChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h4>Company Statistics</h4>
+            <canvas id="companyStatsChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2024 Stock Market Platform | 
+            <a href="{{ url_for('help') }}">Help</a> | 
+            <a href="{{ url_for('settings') }}">Settings</a> |
+            <a href="mailto:support@stockmarket.com">Contact Us</a>
+        </p>
+    </div>
+    <div class="social-icons">
+        <a href="https://instagram.com" target="_blank" class="fab fa-instagram"></a>
+        <a href="https://twitter.com" target="_blank" class="fab fa-twitter"></a>
+        <a href="https://linkedin.com" target="_blank" class="fab fa-linkedin"></a>
+    </div>
+
+    <!-- Chart.js Scripts -->
+
+   <!-- JavaScript Section -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => { 
+        let stockData = {};
+        let charts;
+
+        const searchButton = document.getElementById('searchButton');
+        const searchInput = document.getElementById('searchInput');
+        const resetButton = document.getElementById('resetButton');
+        const filterButton = document.querySelector('.filter-btn');
+        const fromDateInput = document.getElementById('filterFromDate');
+        const toDateInput = document.getElementById('filterToDate');
+
+        // Fetch initial data for all companies
+        fetchAllCompaniesData();
+
+        // Search button listener to fetch data for a specific company
+        searchButton.addEventListener('click', () => {
+            const symbol = searchInput.value.trim().toUpperCase();
+            if (symbol) {
+                fetchCompanyData(symbol);
+            } else {
+                alert('Please enter a valid company symbol.');
+            }
+        });
+
+        // Reset button listener to reload all companies' data
+        resetButton.addEventListener('click', () => {
+            searchInput.value = '';
+            fromDateInput.value = '';
+            toDateInput.value = ''; // Clear the date filter
+            fetchAllCompaniesData();
+        });
+
+        // Filter button listener to apply date range filter
+        filterButton.addEventListener('click', () => {
+            const fromDate = fromDateInput.value;
+            const toDate = toDateInput.value;
+            if (fromDate && toDate) {
+                const filteredData = filterStockDataByDateRange(stockData, fromDate, toDate);
+                const symbols = Object.keys(filteredData);
+                updateKPIs(filteredData, symbols);
+                updateAllCharts(filteredData, symbols);
+            } else {
+                alert('Please select both a start and end date.');
+            }
+        });
+
+        // Function to fetch data for all companies
+        function fetchAllCompaniesData() {
+            fetch('/api/stock-data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.stock_data) {
+                        stockData = data.stock_data;
+                        const symbols = Object.keys(stockData);
+                        updateKPIs(stockData, symbols);
+                        if (charts) {
+                            updateAllCharts(stockData, symbols);
+                        } else {
+                            charts = createCharts(stockData, symbols);
+                        }
+                    } else {
+                        console.error('Invalid stock data format');
+                    }
+                })
+                .catch(error => console.error('Error fetching all companies data:', error));
+        }
+
+        // Function to fetch data for a specific company
+        function fetchCompanyData(symbol) {
+            fetch(`/api/stock-data/${symbol}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && !data.error) {
+                        stockData = { [symbol]: data }; // Only data for searched company
+                        updateKPIs(stockData, [symbol]);
+                        updateAllCharts(stockData, [symbol]);
+                    } else {
+                        alert(data.error || 'No data available for this symbol.');
+                    }
+                })
+                .catch(error => console.error('Error fetching company data:', error));
+        }
+
+        // Function to filter stock data by date range
+        function filterStockDataByDateRange(data, fromDate, toDate) {
+            const filteredData = {};
+            const fromDateISO = new Date(fromDate).toISOString().split('T')[0];
+            const toDateISO = new Date(toDate).toISOString().split('T')[0];
+
+            for (const symbol in data) {
+                const datesInRange = [];
+                const closingPricesInRange = [];
+                const volumesInRange = [];
+
+                data[symbol].dates.forEach((date, index) => {
+                    if (date >= fromDateISO && date <= toDateISO) {
+                        datesInRange.push(date);
+                        closingPricesInRange.push(data[symbol].closing_prices[index]);
+                        volumesInRange.push(data[symbol].volumes[index]);
+                    }
+                });
+
+                // Add filtered data for each symbol, fallback to default arrays if no data within range
+                filteredData[symbol] = datesInRange.length > 0
+                    ? { dates: datesInRange, closing_prices: closingPricesInRange, volumes: volumesInRange, latest_price: closingPricesInRange[closingPricesInRange.length - 1] }
+                    : { dates: data[symbol].dates, closing_prices: new Array(data[symbol].dates.length).fill(null), volumes: new Array(data[symbol].dates.length).fill(0), latest_price: null };
+            }
+            return filteredData;
+        }
+
+        function updateKPIs(data, symbols) {
+            symbols.forEach(symbol => {
+                const valueElement = document.getElementById(`${symbol}Value`);
+                const arrowElement = document.getElementById(`${symbol}Arrow`);
+
+                if (valueElement) {
+                    // Display the latest price
+                    const latestPrice = data[symbol]?.latest_price || 'N/A';
+                    valueElement.textContent = latestPrice !== 'N/A' ? `$${latestPrice.toFixed(2)}` : 'N/A';
+
+                    // Calculate percentage change
+                    const closingPrices = data[symbol]?.closing_prices || [];
+                    if (closingPrices.length >= 2) {
+                        const prevPrice = closingPrices[closingPrices.length - 2];
+                        const change = latestPrice - prevPrice;
+                        const percentChange = (change / prevPrice) * 100;
+
+                        // Display percentage change with arrow
+                        if (percentChange > 0) {
+                            arrowElement.innerHTML = `<span style="color: #4CAF50;">&#9650; ${percentChange.toFixed(2)}%</span>`; // Green arrow up
+                        } else if (percentChange < 0) {
+                            arrowElement.innerHTML = `<span style="color: #FF6347;">&#9660; ${Math.abs(percentChange.toFixed(2))}%</span>`; // Red arrow down
+                        } else {
+                            arrowElement.innerHTML = `<span style="color: #FFFFFF;">0.00%</span>`; // Neutral
+                        }
+                    } else {
+                        arrowElement.innerHTML = `<span style="color: #FFFFFF;">N/A</span>`; // Not available
+                    }
+                }
+            });
+        }
+
+
+    // Function to create all charts initially
+    function createCharts(data, symbols) {
+        const colors = {
+            AAPL: '#FF6384',
+            GOOGL: '#36A2EB',
+            MSFT: '#FFCE56',
+            TSLA: '#4BC0C0',
+            AMZN: '#9966FF',
+            CSCO: '#FF5733',
+            NFLX: '#C70039', // Netflix
+            NVDA: '#28A745', // NVIDIA
+            META: '#6F42C1', // Meta
+            IBM: '#17A2B8'   // IBM
+
+        };
+
+        return {
+            marketTrendsChart: new Chart(document.getElementById('marketTrendsChart'), {
+                type: 'line',
+                data: {
+                    labels: data[symbols[0]].dates,
+                    datasets: symbols.map(symbol => ({
+                        label: `${symbol} Closing Prices`,
+                        data: data[symbol].closing_prices,
+                        borderColor: colors[symbol] || '#FFFFFF',
+                        fill: true
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: '#FFFFFF' // Change legend label color to white
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#FFFFFF' // X-axis label color
+                            },
+                            grid: {
+                                color: '#4a4a4a' // Grid line color
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#FFFFFF' // Y-axis label color
+                            },
+                            grid: {
+                                color: '#4a4a4a' // Grid line color
+                            }
+                        }
+                    }
+                }
+            }),
+            stockPriceMovementsChart: new Chart(document.getElementById('stockPriceMovementsChart'), {
+                type: 'bar',
+                data: {
+                    labels: symbols,
+                    datasets: [{
+                        label: 'Latest Prices',
+                        data: symbols.map(symbol => data[symbol]?.latest_price || 0),
+                        backgroundColor: symbols.map(symbol => colors[symbol] || '#FFFFFF')
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: '#FFFFFF' // Change legend label color to white
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#FFFFFF' // X-axis label color
+                            },
+                            grid: {
+                                color: '#4a4a4a' // Grid line color
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#FFFFFF' // Y-axis label color
+                            },
+                            grid: {
+                                color: '#4a4a4a' // Grid line color
+                            }
+                        }
+                    }
+                }
+            }),
+            stockPriceVariationsChart: new Chart(document.getElementById('stockPriceVariationsChart'), {
+            type: 'bar',
+            data: {
+                labels: data[symbols[0]].dates, // Default to the first stock's dates
+                datasets: symbols.map(symbol => ({
+                    label: `${symbol} Price Variation`,
+                    data: data[symbol].closing_prices,
+                    backgroundColor: data[symbol].closing_prices.map(() => colors[symbol] || '#FFFFFF') // Assign color
+                }))
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#FFFFFF'
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: '#FFFFFF'
+                        },
+                        grid: {
+                            color: '#4a4a4a'
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: '#FFFFFF'
+                        },
+                        grid: {
+                            color: '#4a4a4a'
+                        }
+                    }
+                }
+            }
+        }),
+            movingAverageChart: new Chart(document.getElementById('movingAverageChart'), {
+            type: 'bar',
+            data: {
+                labels: symbols, // Stock symbols on the Y-axis
+                datasets: [{
+                    label: 'Average Closing Prices',
+                    data: symbols.map(symbol => {
+                        const avg = data[symbol].closing_prices.reduce((sum, value) => sum + value, 0) / data[symbol].closing_prices.length;
+                        return avg.toFixed(2); // Calculate average
+                    }),
+                    backgroundColor: symbols.map(symbol => colors[symbol] || '#FFFFFF'),
+                    borderColor: '#000000',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y', // Switches to horizontal bars
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: '#FFFFFF'
+                        },
+                        grid: {
+                            color: '#4a4a4a'
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: '#FFFFFF'
+                        },
+                        grid: {
+                            color: '#4a4a4a'
+                        }
+                    }
+                }
+            }
+        }),
+
+            distributionChart: new Chart(document.getElementById('distributionChart'), {
+                type: 'pie',
+                data: {
+                    labels: symbols,
+                    datasets: [{
+                        data: symbols.map(symbol => data[symbol].volumes.reduce((a, b) => a + b, 0)),
+                        backgroundColor: symbols.map(symbol => colors[symbol] || '#FFFFFF')
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: '#FFFFFF' // Change legend label color to white
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#FFFFFF' // X-axis label color
+                            },
+                            grid: {
+                                color: '#4a4a4a' // Grid line color
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#FFFFFF' // Y-axis label color
+                            },
+                            grid: {
+                                color: '#4a4a4a' // Grid line color
+                            }
+                        }
+                    }
+                }
+            }),
+            companyStatsChart: new Chart(document.getElementById('companyStatsChart'), {
+                type: 'bar',
+                data: {
+                    labels: data[symbols[0]].dates,
+                    datasets: symbols.map(symbol => ({
+                        label: `${symbol} Volume`,
+                        data: data[symbol].volumes,
+                        backgroundColor: colors[symbol] || '#FFFFFF'
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: '#FFFFFF' // Change legend label color to white
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#FFFFFF' // X-axis label color
+                            },
+                            grid: {
+                                color: '#4a4a4a' // Grid line color
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#FFFFFF' // Y-axis label color
+                            },
+                            grid: {
+                                color: '#4a4a4a' // Grid line color
+                            }
+                        }
+                    }
+                }
+            }),
+                    
+        };
+    }
+
+    // Function to update all charts
+    function updateAllCharts(data, symbols) {
+        const colors = {
+            AAPL: '#FF6384',
+            GOOGL: '#36A2EB',
+            MSFT: '#FFCE56',
+            TSLA: '#4BC0C0',
+            AMZN: '#9966FF',
+            CSCO: '#FF5733',
+            NFLX: '#C70039', // Netflix
+            NVDA: '#28A745', // NVIDIA
+            META: '#6F42C1', // Meta
+            IBM: '#17A2B8'   // IBM
+
+        };
+
+        charts.marketTrendsChart.data.labels = data[symbols[0]].dates;
+        charts.marketTrendsChart.data.datasets = symbols.map(symbol => ({
+            label: `${symbol} Closing Prices`,
+            data: data[symbol].closing_prices,
+            borderColor: colors[symbol] || '#FFFFFF',
+            fill: true
+        }));
+        charts.marketTrendsChart.update();
+
+        charts.stockPriceMovementsChart.data.labels = symbols;
+        charts.stockPriceMovementsChart.data.datasets[0].data = symbols.map(symbol => data[symbol]?.latest_price || 0);
+        charts.stockPriceMovementsChart.data.datasets[0].backgroundColor = symbols.map(symbol => colors[symbol] || '#FFFFFF');
+        charts.stockPriceMovementsChart.update();
+
+        charts.stockPriceVariationsChart.data.labels = data[symbols[0]].dates;
+    charts.stockPriceVariationsChart.data.datasets = symbols.map(symbol => ({
+        label: `${symbol} Price Variation`,
+        data: data[symbol].closing_prices,
+        backgroundColor: data[symbol].closing_prices.map(() => colors[symbol] || '#FFFFFF')
+    }));
+    charts.stockPriceVariationsChart.update();
+
+
+        // Update Moving Averages Chart
+    charts.movingAverageChart.data.labels = symbols;
+    charts.movingAverageChart.data.datasets[0].data = symbols.map(symbol => {
+        const avg = data[symbol].closing_prices.reduce((sum, value) => sum + value, 0) / data[symbol].closing_prices.length;
+        return avg.toFixed(2);
+    });
+    charts.movingAverageChart.data.datasets[0].backgroundColor = symbols.map(symbol => colors[symbol] || '#FFFFFF');
+    charts.movingAverageChart.update();
+
+        charts.distributionChart.data.labels = symbols;
+        charts.distributionChart.data.datasets[0].data = symbols.map(symbol => data[symbol].volumes.reduce((a, b) => a + b, 0));
+        charts.distributionChart.data.datasets[0].backgroundColor = symbols.map(symbol => colors[symbol] || '#FFFFFF');
+        charts.distributionChart.update();
+
+        charts.companyStatsChart.data.labels = data[symbols[0]].dates;
+        charts.companyStatsChart.data.datasets = symbols.map(symbol => ({
+            label: `${symbol} Volume`,
+            data: data[symbol].volumes,
+            backgroundColor: colors[symbol] || '#FFFFFF'
+        }));
+        charts.companyStatsChart.update();
+    }
+
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'top' } },
+        scales: { x: { ticks: { color: '#FFFFFF' } }, y: { ticks: { color: '#FFFFFF' } } }
+    };
+});
+
+
+    </script>
+</body>
+</html>

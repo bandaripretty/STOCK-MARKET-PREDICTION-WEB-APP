@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Settings</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-color: #0f2d4d;
+            font-family: 'Arial', sans-serif;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        .logo {
+            display: block;
+            width: 40px;
+            height: 40px;
+            vertical-align: middle;
+        }
+        .sidebar {
+            position: absolute;
+            top: 60px;
+            left: 0;
+            width: 220px;
+            height: calc(100% - 60px);
+            background-color: #0c233d;
+            padding-top: 20px;
+            overflow: hidden;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .sidebar ul li {
+            padding: 15px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+        .sidebar ul li:hover {
+            background-color: #198cb3;
+        }
+        .sidebar li i {
+            font-size: 1.5rem;
+            color: white;
+            margin-right: 10px;
+        }
+        .sidebar ul li a {
+            color: white;  /* Change text color to white */
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .main-content {
+        margin-left: 240px;
+        padding: 80px 20px 20px 20px; /* Add top padding to clear the fixed header */
+        height: calc(100vh - 80px); /* Adjust height calculation */
+        overflow: auto;
+        }
+        .header {
+            background-color: #0c233d;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            height: 60px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+        }
+        .header .logo-section {
+            display: flex;
+            align-items: center;
+        }
+        .header .logo-section img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        .header .logo-section h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .user-icon {
+            font-size: 1.5rem;
+            color: white;
+            padding-right: 10px;
+        }
+        .settings-container {
+            background-color: #1b3b63;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            color: white;
+        }
+        .form-group label {
+            color: white;
+        }
+        .btn-primary {
+            background-color: #198cb3;
+            border-color: #198cb3;
+        }
+        .btn-primary:hover {
+            background-color: #136e91;
+            border-color: #136e91;
+        }
+        .social-icons {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            gap: 15px; /* Add space between icons */
+            align-items: center;
+            
+        }
+        .social-icons a {
+            font-size: 1.5rem;
+            text-decoration: none;
+            color: white;
+            
+        }  
+        .footer {
+            background-color: rgba(12, 35, 61, 0.9);
+            padding: 0px;
+            text-align: center;
+            color: white;
+            width: 100%;
+            position: fixed;
+            bottom: 0px;
+            align-items: center;
+        }
+        
+
+        .footer a {
+            color: #3498db;
+            text-decoration: none;
+            margin: 5px 5px;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo-section">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+            <h2>STOCK MARKET</h2>
+        </div>
+        <div>
+            <i class="fas fa-user-circle user-icon"></i> {{ current_user.username }}
+            <a href="{{ url_for('logout') }}" class="btn btn-light ml-2">Logout</a>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <ul>
+            <li><i class="fas fa-chart-line"></i> <a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><i class="fas fa-chart-area"></i> <a href="{{ url_for('market_trends') }}">Market Trends</a></li>
+            <li><i class="fas fa-archive"></i> <a href="{{ url_for('archive') }}">Archive</a></li>
+            <li><i class="fas fa-cog"></i> <a href="{{ url_for('settings') }}">Settings</a></li>
+            <li><i class="fas fa-question-circle"></i> <a href="{{ url_for('help') }}">Help</a></li>
+        </ul>
+    </div>
+     <!-- Footer -->
+     <div class="footer">
+        <p>&copy; 2024 Stock Market Platform | 
+            <a href="{{ url_for('help') }}">Help</a> | 
+            <a href="{{ url_for('settings') }}">Settings</a>
+        </p>
+    </div>
+    <div class="social-icons">
+        <a href="https://instagram.com" target="_blank" class="fab fa-instagram"></a>
+        <a href="https://twitter.com" target="_blank" class="fab fa-twitter"></a>
+        <a href="https://linkedin.com" target="_blank" class="fab fa-linkedin"></a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h3>User Settings</h3>
+        <div class="settings-container">
+            <!-- Form for updating email -->
+            <form method="POST" action="{{ url_for('update_settings') }}">
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}" required>
+                </div>
+
+                <!-- Form for updating password -->
+                <div class="form-group">
+                    <label for="current_password">Current Password:</label>
+                    <input type="password" class="form-control" id="current_password" name="current_password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="new_password">New Password:</label>
+                    <input type="password" class="form-control" id="new_password" name="new_password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password">Confirm New Password:</label>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update Settings</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

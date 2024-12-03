@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Market Platform</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #0f2d4d;
+            font-family: 'Arial', sans-serif;
+            color: white;
+            margin: 0;
+            padding: 0;
+            overflow: auto;
+        }
+
+        /* Header Section */
+        .header {
+            background-color: rgba(0, 0, 0, 0.85);
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .header .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header .logo-section img {
+            width: 40px;
+            height: 30px;
+        }
+
+        .header .logo-section h2 {
+            font-size: 1.5rem;
+            color: white;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .header a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            margin-right: 20px;
+            transition: color 0.3s, transform 0.2s;
+        }
+
+        .header a:hover {
+            color: #1abc9c;
+            transform: scale(1.1);
+        }
+
+        /* Carousel Section */
+        .carousel {
+            margin-top: 50px; /* Add space below the fixed header */
+        }
+
+        .carousel-inner img {
+            width: 100%;
+            height: 450px;
+            object-fit: cover;
+        }
+        .custom-arrow {
+            width: 15%; /* Adjust this value for the arrow size */
+        }
+
+        .carousel-control-prev {
+            left: -5%; /* Adjust the value to position the arrow further to the left */
+        }
+
+        .carousel-control-next {
+            right: -5%; /* Adjust the value to position the arrow further to the right */
+        }
+
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            /* background-color: #df720ce2; /* Change the background color of the arrows */
+            border-radius: 50%; /* Optional: Make the arrow background circular */
+            padding: 10px; /* Add padding for better visibility */
+        }
+
+        .carousel-control-prev-icon::before,
+        .carousel-control-next-icon::before {
+            color: #ffffff; /* Change the color of the arrow icons */
+            font-size: 3rem; /* Adjust the size of the arrow icons */
+        }
+
+        /* Main Layout */
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .main-content {
+            width: 75%; /* Increased width for left alignment */
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            margin-top: 20px;
+        }
+
+        .tips {
+            width: 35%; /* Reduced width for Financial Tips section */
+            background-color: #1b3b63;
+            padding: 20px;
+            color: #1abc9c;
+            border-radius: 10px;
+            margin-left: 20px;
+        }
+        .tips h4 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        .tips p {
+            font-size: 1rem;
+            color: #bdc3c7;
+        }
+
+        /* Card Styles */
+        .card {
+            width: 230px;
+            margin: 10px;
+            background: linear-gradient(145deg, #1b3b63, #213d70);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+        }
+
+        .card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .card-text {
+            font-size: 0.9rem;
+            color: #bdc3c7;
+            margin-bottom: 15px;
+        }
+
+        .btn-view {
+            background-color: #1abc9c;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 1rem;
+            border-radius: 50px;
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .btn-view:hover {
+            background-color: #16a085;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        .stock-market-categories {
+            width: 100%; /* Full-width layout */
+            padding: 10px 40px; /* Space inside the section */
+            background-color: #0f2d4d; /* Background color matching the theme */
+            color: white; /* Text color */
+            display: flex;
+            flex-wrap: wrap; /* Wrap items to next row */
+            justify-content: center; /* Evenly space items */
+            row-gap: 0px; /* Vertical spacing between rows */
+        }
+        .stock-market-categories::before {
+            content: ""; /* Create a decorative line */
+            display: block;
+            width: 90%; /* Line width */
+            height: 0.5px; /* Line height */
+            background-color: #edf1f0; /* Line color */
+            margin: 0 auto 20px auto; /* Center and add spacing below */
+        }
+
+        .stock-market-categories h3 {
+            text-align: left; /* Align title to the left */
+            font-size: 1.6rem; /* Adjust title size */
+            color: #1abc9c; /* Title color */
+            width: 100%; /* Make the title span across the container */
+            margin-bottom: 30px; /* Space below the title */
+        }
+
+        .stock-market-categories .col-md-2 {
+            flex: 1 1 calc(16.6% - 10px); /* Six columns per row */
+            max-width: calc(16.6% - 20px);
+            margin-bottom: 20px;
+        }
+
+        .stock-market-categories h5 {
+            font-size: 1rem; /* Smaller category title font size */
+            color: white; /* Category title color */
+            margin-bottom: 10px; /* Space below category title */
+            font-weight: bold; /* Bold category titles */
+        }
+
+        .stock-market-categories ul {
+            list-style: none; /* Remove bullet points */
+            padding: 0; /* Remove default padding */
+            margin: 0; /* Remove default margin */
+        }
+
+        .stock-market-categories ul li {
+            margin-bottom: 10px; /* Space between list items */
+            font-size: 0.9rem; /* Smaller font size for items */
+        }
+
+        .stock-market-categories ul li a {
+            color: #ffffff; /* Link color */
+            text-decoration: none; /* Remove underline */
+            transition: color 0.3s ease; /* Smooth color transition */
+        }
+
+        .stock-market-categories ul li a:hover {
+            color: #1abc9c; /* Change color on hover */
+            text-decoration: underline; /* Add underline on hover */
+        }
+
+        .stock-market-categories ul li a::before {
+            content: "• "; /* Add bullet-like symbol */
+            color: #1abc9c; /* Color for the symbol */
+            font-weight: bold; /* Make the bullet bold */
+        }
+        .stock-market-categories .row {
+            display: flex; /* Enable flexbox layout */
+            flex-wrap: wrap; /* Allow items to wrap */
+            gap: 0; /* Remove any inherent gap between items */
+            margin: 0; /* Remove margins on the row */
+            row-gap: 0; /* Ensure vertical space is zero */
+            justify-content: center; /* Center-align all columns */
+        }
+
+
+        .footer {
+            background-color: rgba(0, 0, 0, 0.85);
+            padding: 3px;
+            color: white;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            left: 0;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        .social-icons {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            gap: 15px; /* Add space between icons */
+            
+        }
+
+        .social-icons a {
+            font-size: 1.5rem;
+            text-decoration: none;
+            color: white;
+        }
+        .tips {
+            width: 35%; /* Adjust the width of the container */
+            height: 100%;
+            background-color: #1b3b63;
+            padding: 10px; /* Reduced padding for a more compact look */
+            color: #1abc9c;
+            border-radius: 10px;
+            margin-left: 20px;
+            margin-top: 20px; /* Space from the top */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .tips h4 {
+            font-size: 1.2rem; /* Reduced font size */
+            margin-bottom: 10px; /* Reduced margin */
+        }
+
+        .tips p {
+            font-size: 0.9rem; /* Reduced text size */
+            color: #bdc3c7;
+        }
+
+        .tips img {
+            width: 100%;
+            height: auto; /* Maintain aspect ratio */
+            border-radius: 5px; /* Slight rounding for the image */
+            margin-top: 10px;
+        }
+
+        .tips .btn-view {
+            width: 100%;
+            margin-top: 10px;
+            padding: 8px; /* Compact button padding */
+            font-size: 0.9rem; /* Reduced button text size */
+        }
+        
+</style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <div class="header">
+        <div class="logo-section">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+            <h2>STOCK MARKET</h2>
+        </div>
+        <div>
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
+        </div>
+    </div>
+
+    <!-- Carousel Section -->
+    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+        <ol class="carousel-indicators">
+            <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+            <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+            <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+            <li data-target="#carouselExampleIndicators" data-slide-to="3"></li>
+        </ol>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="https://media.istockphoto.com/id/157308559/photo/money-pile-100-dollar-bills.jpg?s=612x612&w=0&k=20&c=cp3TXTWV-7N-2yZot3IsXf1v1mUWMlF1XzSeNGZUVNQ=" alt="First slide">
+            </div>
+            <div class="carousel-item">
+                <img src="https://m.economictimes.com/thumb/msid-112332988,width-1200,height-900,resizemode-4,imgsize-669098/bse-sensex-today-live-nifty-stock-market-updates-gift-nifty-godrej-consumer-nhpc-q1-results-share-price-07-august-2024.jpg" alt="Second slide">
+            </div>
+            <div class="carousel-item">
+                <img src="https://media.istockphoto.com/id/1938654475/photo/economic-risk-management-concept-businessman-holding-wooden-block-with-word-risk-with-level.jpg?s=612x612&w=0&k=20&c=CSjTkbqMSCfghUDqsiOQShiEWu7htpAvPAsaj8ny63I=" alt="Third slide">
+            </div>
+            <div class="carousel-item">
+                <img src="https://media.istockphoto.com/id/1463681745/photo/businessman-use-electronic-pen-writing-rising-colorful-graph-from-2023-to-2024-year-of.jpg?s=612x612&w=0&k=20&c=BU2KPpvgTAEXnJWL0jKOJ-uRx1LK2h_6XJBlNOkiy_k=" alt="Third slide">
+            </div>
+
+        </div>
+        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+    
+    <!-- Main Content Section with Sidebars -->
+    <div class="container">
+       
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Stocks Section -->
+            <div>
+                <h3 class="section-title"><i class="fas fa-chart-line"></i> Top Stocks</h3>
+                <div class="card">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9yscIVMLrtjtD31GFh7MVeW9sIAS8FMBgog&s" alt="Amazon Stock">
+                    <div class="card-body">
+                        <h5 class="card-title">Amazon Inc. (AMZN)</h5>
+                        <p class="card-text">Current Price: $208.95</p>
+                        <a href="{{ url_for('dashboard') }}" target="_blank">
+                            <button class="btn btn-view">View Details</button>
+                        </a>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="https://imageio.forbes.com/specials-images/imageserve/66b994dbfbbcb6cfe5abe998/Apple-Lost--160-Billion-in-Market-Value/960x0.jpg?format=jpg&width=960" alt="Apple Stock">
+                    <div class="card-body">
+                        <h5 class="card-title">Apple Inc. (AAPL)</h5>
+                        <p class="card-text">Current Price: $150.45</p>
+                        <a href="{{ url_for('dashboard') }}" target="_blank">
+                            <button class="btn btn-view">View Details</button>
+                        </a>
+                    </div>
+                    
+                </div>
+                
+            </div>
+
+            <!-- Latest News Section -->
+            <div>
+                <h3 class="section-title"><i class="fas fa-newspaper"></i> Latest News</h3>
+                <div class="card">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREInp5YCXcjMy55iSWdU76gDCiLUlnUGR7_Q&s" alt="Stock Market News">
+                    <div class="card-body">
+                        <h5 class="card-title">Market Surge</h5>
+                        <p class="card-text">The stock market is experiencing a significant surge as investor confidence rises.</p>
+                        <a href="https://get.investors.com/marketsurge/" target="_blank">
+                            <button class="btn btn-view">Read More</button>
+                        </a>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="https://png.pngtree.com/thumb_back/fh260/background/20230704/pngtree-3d-render-of-crypto-currency-and-nft-composition-image_3828737.jpg" alt="Crypto News">
+                    <div class="card-body">
+                        <h5 class="card-title">Cryptocurrency Trends</h5>
+                        <p class="card-text">Cryptocurrencies experience volatile changes in the current market landscape.</p>
+                        <a href="https://www.forbes.com/digital-assets/crypto-prices/?sh=799b15492478" target="_blank">
+                            <button class="btn btn-view">Read More</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            <!-- Investment Insights Section -->
+            <div>
+                <h3 class="section-title"><i class="fas fa-lightbulb"></i> Investment Insights</h3>
+                <div class="card">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjKQnzG1zSUQ6iC8bFRDytniHoBWwQa_54cA&s" alt="Investment Tips">
+                    <div class="card-body">
+                        <h5 class="card-title">Investment Tips for 2024</h5>
+                        <p class="card-text">Discover top investment strategies to maximize your returns in the upcoming year.</p>
+                        <a href="https://www.bankrate.com/investing/best-investments/" target="_blank">
+                            <button class="btn btn-view">Explore Tips</button>
+                        </a>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="https://centerpointsecurities.com/wp-content/uploads/2017/04/522749567.jpg" alt="Stock Analysis">
+                    <div class="card-body">
+                        <h5 class="card-title">Stock Analysis Guide</h5>
+                        <p class="card-text">Learn how to analyze stocks effectively to make smarter investment decisions.</p>
+                        <a href="https://www.sec.gov/about/reports-publications/investorpubsanalystshtm" target="_blank">
+                            <button class="btn btn-view">Learn More</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+             <!-- Right Financial Tips Section -->
+        <div class="tips">
+            <h4>Financial Tips</h4>
+            <p>“Invest in what you know.” – Peter Lynch</p>
+            <p>Consider diversifying your portfolio to reduce risk and maximize returns.</p>
+            <img src="https://i.ytimg.com/vi/exnBeSCUBCc/maxresdefault.jpg" alt="Tip" style="width: 100%; margin-top: 10px;">
+            <a href="https://www.linkedin.com/pulse/title-timeless-wisdom-peter-lynch-invest-what-you-know-pushkar-raj-c5zlc/" target="_blank">
+                <button class="btn btn-view" style="width: 100%; margin-top: 10px;">Explore Tips</button>
+            </a>
+            <div class="sidebar-right" style="margin-top: 20px;">
+                <h4>Latest Articles</h4>
+                <p>Stay updated with our latest articles on stock market insights, economic trends, and financial advice to keep you informed and prepared.</p>
+                <img src="https://media.licdn.com/dms/image/v2/D5612AQG2erdahIEFLA/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1697722362368?e=2147483647&v=beta&t=0wtB267PXUe_KPtEsUhTrXYmyU8NGnCVezx0ajQ5uyQ" alt="Tip" style="width: 100%; margin-top: 10px;">
+                <a href="https://www.linkedin.com/pulse/expertise-uncertain-times-navigating-stock-market-john-diciaccio-aoi4c/" target="_blank">
+                    <button class="btn btn-view" style="width: 100%; margin-top: 10px;">Explore Tips</button>
+                </a>
+            </div>
+        </div>
+   
+        </div>
+            <div class="stock-market-categories">
+                <h3 class="text-center">Explore Stock Market Categories</h3>
+                <div class="row">
+                    <!-- Stock Analysis Section -->
+                    <div class="col-md-2">
+                        <h5>Stock Analysis</h5>
+                        <ul>
+                            <li><a href="https://en.wikipedia.org/wiki/Technical_analysis">Technical Analysis</a></li>
+                            <li><a href="https://www.investopedia.com/terms/f/fundamentalanalysis.asp#:~:text=Fundamental%20analysis%20is%20used%20to,used%20to%20assess%20a%20company.">Fundamental Analysis</a></li>
+                            <li><a href="https://finance.yahoo.com/sectors/">Sector Analysis</a></li>
+                            <li><a href="https://finance.yahoo.com/calendar/">Market Sentiment</a></li>
+                        </ul>
+                            <h5>Investor Services</h5>
+                            <ul>
+                                <li><a href="https://finance.yahoo.com/portfolios/">Portfolio Management</a></li>
+                                <li><a href="https://finance.yahoo.com/personal-finance/taxes/">Tax Planning</a></li>
+                                <li><a href="https://www.nerdwallet.com/article/investing/retirement-planning-an-introduction">Retirement Planning</a></li>
+                                <li><a href="https://corient.com/?utm_source=bing&utm_medium=ppc&utm_content=brand&utm_campaign=brandq224&msclkid=91e868519ec919331b2f0f6ca120644c">Wealth Advisory</a></li>
+                            </ul>
+                        
+                    </div>
+                    <!-- Investment Options Section -->
+                    <div class="col-md-2">
+                        <h5>Investment Options</h5>
+                        <ul>
+                            <li><a href="https://www.investopedia.com/terms/e/equitymarket.asp">Equities</a></li>
+                            <li><a href="https://investor.vanguard.com/investor-resources-education/understanding-investment-types/what-is-a-bond#:~:text=By%20buying%20a%20bond%2C%20you,give%20you%20no%20ownership%20rights.">Bonds</a></li>
+                            <li><a href="https://www.usbank.com/splash/investment-services/full-suite-investment-services.html?ecid=PS_71760&c3apidt=p80517375595&ds_e=GOOGLE&ds_c=CSM+-+CIB+Orchestration_(InMarket-NB)+Investment+Services_NB_All_All_NAT_1866317&ds_a=General+INVS_NB_EX&ds_k=etfs&ds_kids=p80517375595&i=1&gclsrc=aw.ds&gad_source=1&gclid=Cj0KCQiAi_G5BhDXARIsAN5SX7pYOCnf7PA9o_yCTSm-T2gyRgBlzLVeA0u-KAhYGFkbLnIs1avxNeIaAvYUEALw_wcB&gclsrc=aw.ds">ETFs</a></li>
+                            <li><a href="https://www.schwab.com/mutual-funds/understand-mutual-funds#panel--66-long-94941">Mutual Funds</a></li>
+                        </ul>
+                        <!-- About Stock Market Section -->
+                        <h5>About Stock Market</h5>
+                        <ul>
+                            <li><a href="https://www.sofi.com/learn/content/history-of-the-stock-market/#:~:text=The%20stock%20market%20has%20a,U.S.%20during%20the%2018th%20century.&text=The%20stock%20market%20works%20by,and%20sellers%20of%20financial%20securities.">History of Stock Markets</a></li>
+                            <li><a href="https://www.britannica.com/money/financial-market-regulators">Market Regulators</a></li>
+                            <li><a href="https://www.nyse.com/markets/hours-calendars">Market Timings</a></li>
+                            <li><a href="https://www.nasdaq.com/articles/the-most-frequently-asked-questions-about-the-stock-market-in-2022">FAQs</a></li>
+                        </ul>
+                    </div>
+                    <!-- Trading Tools Section -->
+                    <div class="col-md-2">
+                        <h5>Trading Tools</h5>
+                        <ul>
+                            <li><a href="https://en.wikipedia.org/wiki/Electronic_trading">Trading Platforms</a></li>
+                            <li><a href="https://finance.yahoo.com/screener/new/">Stock Screeners</a></li>
+                            <li><a href="https://www.softwareag.com/en_corporate/resources/process-management/ds/risk-compliance-management.html">Risk Management Tools</a></li>
+                            <li><a href="https://trendspider.com/?utm_souce=general_market&utm_medium=adwords/?utm_source=consolidated_converters&utm_medium=adwords&gad_source=1&gclid=Cj0KCQiAi_G5BhDXARIsAN5SX7q6wDK84iphnx4HVbauPhISxSk6OEmdZNF6fSi8MVDWzl80EePwbfkaAoDnEALw_wcB">Live Market Charts</a></li>
+                        </ul>
+                         <!-- Tools for Investors Section -->
+                        <h5>Tools for Investors</h5>
+                        <ul>
+                            <li><a href="https://byjus.com/profit-calculator/">Profit/Loss Calculators</a></li>
+                            <li><a href="https://www.marketbeat.com/dividends/calculator/">Dividend Calculators</a></li>
+                            <li><a href="https://finance.yahoo.com/currency-converter/">Currency Converters</a></li>
+                            <li><a href="https://www.capterra.com/sem-compare/risk-management-software/?utm_source=ps-google&utm_medium=ppc&utm_campaign=:1:CAP:2:COM:3:All:4:US:5:BAU:6:SOF:7:Desktop:8:BR:9:Risk_Management&network=g&gclid=Cj0KCQiAi_G5BhDXARIsAN5SX7plKbeRPEEu_gi0YUOYSuzYW3WV_RLPBqsk9dIygM9RM3fko0lgvkMaAgkwEALw_wcB">Risk Assessment Tools</a></li>
+                        </ul>
+                    </div>
+                    <!-- Learning Resources Section -->
+                    <div class="col-md-2">
+                        <h5>Learning Resources</h5>
+                        <ul>
+                            <li><a href="https://www.bankrate.com/investing/stock-market-basics-for-beginners/">Beginner Guides</a></li>
+                            <li><a href="https://get.investors.com/infographics/5-advanced-buying-strategies/">Advanced Strategies</a></li>
+                            <li><a href="https://www.bloomberg.com/professional/insights/webinars/trading-investing/">Webinars</a></li>
+                            <li><a href="https://smartasset.com/investing/investing-blogs">Investment Blogs</a></li>
+                        </ul>
+                        <h5>Industry Reports</h5>
+                        <ul>
+                            <li><a href="https://finance.yahoo.com/sectors/technology/">Technology Sector</a></li>
+                            <li><a href="https://finance.yahoo.com/quote/%5EBUKHLTH/">Healthcare Sector</a></li>
+                            <li><a href="https://finance.yahoo.com/quote/WENS.AS/">Energy Sector</a></li>
+                            <li><a href="https://finance.yahoo.com/sectors/financial-services/">Financial Sector</a></li>
+                        </ul>
+                    </div>
+                    <!-- Financial News Section -->
+                    <div class="col-md-2">
+                        <h5>Financial News</h5>
+                        <ul>
+                            <li><a href="https://finance.yahoo.com/news/instagram-soon-let-reset-recommendations-131716302.html">Daily Updates</a></li>
+                            <li><a href="https://finance.yahoo.com/calendar/economic">Economic Indicators</a></li>
+                            <li><a href="https://finance.yahoo.com/live/company-of-the-year/">Company Announcements</a></li>
+                            <li><a href="https://finance.yahoo.com/calendar/ipo">IPO News</a></li>
+                        </ul>
+                        <!-- Stock Market Strategies Section -->
+                        <h5>Stock Market Strategies</h5>
+                        <ul>
+                            <li><a href="https://finance.yahoo.com/news/generation-income-properties-announces-third-213000393.html">Short-Term Strategies</a></li>
+                            <li><a href="https://finance.yahoo.com/news/integrity-acquire-innovative-underwriters-guardian-210100251.html">Long-Term Strategies</a></li>
+                            <li><a href="https://finance.yahoo.com/quote/%5ECRWDTRCA/">Swing Trading</a></li>
+                            <li><a href="https://finance.yahoo.com/quote/%5ECRWDTRCA/">Day Trading</a></li>
+                        </ul>
+                    </div>
+                    <!-- Market Trends Section -->
+                    <div class="col-md-2">
+                        <h5>Market Trends</h5>
+                        <ul>
+                            <li><a href="https://finance.yahoo.com/quote/H61Q.HM/">Global Market Trends</a></li>
+                            <li><a href="#">Sector Trends</a></li>
+                            <li><a href="#">Top Gainers & Losers</a></li>
+                            <li><a href="#">Earnings Reports</a></li>
+                        </ul>
+                        <h5>Corporate Actions</h5>
+                        <ul>
+                            <li><a href="https://finance.yahoo.com/calendar/splits">Stock Splits</a></li>
+                            <li><a href="https://finance.yahoo.com/quote/FRDTX/">Dividends</a></li>
+                            <li><a href="https://finance.yahoo.com/quote/EAAAX/">Mergers & Acquisitions</a></li>
+                            <li><a href="https://finance.yahoo.com/news/hp-share-buybacks-drive-q4-170710257.html">Buybacks</a></li>
+                        </ul>
+                    </div>
+                </div>
+            
+                </div>
+                           
+            </div>              
+        </div>
+        
+       
+    
+
+    <div class="footer">
+        <p>&copy; 2024 Stock Market Platform | 
+            <a href="{{ url_for('help') }}">Help</a>| 
+            <a href="{{ url_for('support') }}">Support</a>
+        </p> 
+    </div>
+    <div class="social-icons">
+        <a href="https://instagram.com" target="_blank" class="fab fa-instagram"></a>
+        <a href="https://twitter.com" target="_blank" class="fab fa-twitter"></a>
+        <a href="https://linkedin.com" target="_blank" class="fab fa-linkedin"></a>
+    </div>
+   
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
