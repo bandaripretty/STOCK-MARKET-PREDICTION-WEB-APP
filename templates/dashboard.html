@@ -470,11 +470,13 @@
             fetchAllCompaniesData();
         });
 
-        // Filter button listener to apply date range filter
+        // Filter button listener to apply the date range filter
         filterButton.addEventListener('click', () => {
             const fromDate = fromDateInput.value;
             const toDate = toDateInput.value;
+
             if (fromDate && toDate) {
+                // Convert the date range to ISO format for comparison
                 const filteredData = filterStockDataByDateRange(stockData, fromDate, toDate);
                 const symbols = Object.keys(filteredData);
                 updateKPIs(filteredData, symbols);
@@ -483,6 +485,44 @@
                 alert('Please select both a start and end date.');
             }
         });
+
+        // Function to filter stock data by date range
+        function filterStockDataByDateRange(data, fromDate, toDate) {
+            const filteredData = {};
+            const fromDateISO = new Date(fromDate).toISOString().split('T')[0];
+            const toDateISO = new Date(toDate).toISOString().split('T')[0];
+
+            for (const symbol in data) {
+                const filteredDates = [];
+                const filteredClosingPrices = [];
+                const filteredVolumes = [];
+                const filteredOpeningPrices = [];
+                const filteredHighPrices = [];
+                const filteredLowPrices = [];
+
+                data[symbol].dates.forEach((date, index) => {
+                    if (date >= fromDateISO && date <= toDateISO) {
+                        filteredDates.push(date);
+                        filteredClosingPrices.push(data[symbol].closing_prices[index]);
+                        filteredVolumes.push(data[symbol].volumes[index]);
+                        filteredOpeningPrices.push(data[symbol].opening_prices[index]);
+                        filteredHighPrices.push(data[symbol].high_prices[index]);
+                        filteredLowPrices.push(data[symbol].low_prices[index]);
+                    }
+                });
+
+                filteredData[symbol] = {
+                    dates: filteredDates,
+                    closing_prices: filteredClosingPrices,
+                    volumes: filteredVolumes,
+                    opening_prices: filteredOpeningPrices,
+                    high_prices: filteredHighPrices,
+                    low_prices: filteredLowPrices,
+                    latest_price: filteredClosingPrices[filteredClosingPrices.length - 1],
+                };
+            }
+            return filteredData;
+        }
 
         // Function to fetch data for all companies
         function fetchAllCompaniesData() {
@@ -521,32 +561,7 @@
                 .catch(error => console.error('Error fetching company data:', error));
         }
 
-        // Function to filter stock data by date range
-        function filterStockDataByDateRange(data, fromDate, toDate) {
-            const filteredData = {};
-            const fromDateISO = new Date(fromDate).toISOString().split('T')[0];
-            const toDateISO = new Date(toDate).toISOString().split('T')[0];
-
-            for (const symbol in data) {
-                const datesInRange = [];
-                const closingPricesInRange = [];
-                const volumesInRange = [];
-
-                data[symbol].dates.forEach((date, index) => {
-                    if (date >= fromDateISO && date <= toDateISO) {
-                        datesInRange.push(date);
-                        closingPricesInRange.push(data[symbol].closing_prices[index]);
-                        volumesInRange.push(data[symbol].volumes[index]);
-                    }
-                });
-
-                // Add filtered data for each symbol, fallback to default arrays if no data within range
-                filteredData[symbol] = datesInRange.length > 0
-                    ? { dates: datesInRange, closing_prices: closingPricesInRange, volumes: volumesInRange, latest_price: closingPricesInRange[closingPricesInRange.length - 1] }
-                    : { dates: data[symbol].dates, closing_prices: new Array(data[symbol].dates.length).fill(null), volumes: new Array(data[symbol].dates.length).fill(0), latest_price: null };
-            }
-            return filteredData;
-        }
+        
 
         function updateKPIs(data, symbols) {
             symbols.forEach(symbol => {
@@ -603,7 +618,7 @@
                 data: {
                     labels: data[symbols[0]].dates,
                     datasets: symbols.map(symbol => ({
-                        label: `${symbol} Closing Prices`,
+                        label: `${symbol}`,
                         data: data[symbol].closing_prices,
                         borderColor: colors[symbol] || '#FFFFFF',
                         fill: true
@@ -688,7 +703,7 @@
             data: {
                 labels: data[symbols[0]].dates, // Default to the first stock's dates
                 datasets: symbols.map(symbol => ({
-                    label: `${symbol} Price Variation`,
+                    label: `${symbol}`,
                     data: data[symbol].closing_prices,
                     backgroundColor: data[symbol].closing_prices.map(() => colors[symbol] || '#FFFFFF') // Assign color
                 }))

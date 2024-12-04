@@ -1,0 +1,38 @@
+Stock Market Dashboard:
+A powerful and intuitive web application that provides stock market insights through interactive charts and data visualizations. 
+The dashboard is designed to cater to users who wish to 
+    analyze market trends, 
+    view stock price variations, and 
+    explore historical stock data.
+
+Features:
+    Real-time Stock Data: Fetches live stock market data for companies using yFinance.
+    Interactive Charts: Displays stock trends, price variations, moving averages, and company statistics using Chart.js.
+    Date Filters: Allows users to filter stock data by specific date ranges.
+    Stock Search: Search for specific stock symbols to display tailored charts and metrics.
+    Archived Data: View historical stock data in a tabular format for reference.
+    Responsive Design: Fully responsive UI built using Bootstrap for seamless use across devices.
+    User Authentication: Secure login and registration system with hashed passwords using Flask-Login.
+
+Technologies Used:
+Backend:
+    Python
+    Flask
+    PostgreSQL
+    SQLAlchemy
+Frontend:
+    HTML5
+    CSS3
+    Bootstrap
+    Chart.js
+    JavaScript
+APIs:
+yFinance (Yahoo Finance API) for fetching stock data.
+
+Getting Started:
+Follow the steps below to set up the project locally:
+
+Prerequisites:
+    Python 3.8 or higher
+    PostgreSQL 12 or higher
+    Git

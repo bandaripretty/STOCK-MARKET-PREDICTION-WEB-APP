@@ -96,7 +96,6 @@ def market_trends_data():
     })
 
 
-
 @app.route('/market-trends')
 @login_required
 def market_trends():
@@ -231,12 +230,15 @@ def all_stocks_data():
 
     for symbol in symbols:
         stock = yf.Ticker(symbol)
-        hist = stock.history(period='5d')
+        hist = stock.history(period="1y")  # Fetch all historical data
         stock_data[symbol] = {
-            'latest_price': round(hist['Close'].iloc[-1], 2) if not hist.empty else None,
-            'dates': hist.index.strftime('%Y-%m-%d').tolist() if not hist.empty else [],
-            'closing_prices': hist['Close'].tolist() if not hist.empty else [],
-            'volumes': hist['Volume'].tolist() if not hist.empty else []
+            'latest_price': round(hist['Close'].iloc[-1], 2),
+            'dates': hist.index.strftime('%Y-%m-%d').tolist(),
+            'closing_prices': hist['Close'].tolist(),
+            'opening_prices': hist['Open'].tolist(),
+            'high_prices': hist['High'].tolist(),
+            'low_prices': hist['Low'].tolist(),
+            'volumes': hist['Volume'].tolist(),
         }
     return jsonify({'stock_data': stock_data})
 
